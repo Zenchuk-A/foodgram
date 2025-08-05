@@ -1,7 +1,6 @@
-from django.contrib import admin
-from django.urls import path, include, re_path
-
 from api.v1.views import redirect_to_recipe
+from django.contrib import admin
+from django.urls import include, path, re_path
 
 urlpatterns = [
     # path(

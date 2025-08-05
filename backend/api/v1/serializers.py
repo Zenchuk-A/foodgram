@@ -1,27 +1,25 @@
 import base64
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.files.base import ContentFile
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.exceptions import NotAuthenticated
-from django.core.files.base import ContentFile
-from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
-from django.db import transaction
-from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from recipes.models import (
-    Tag,
-    Ingredient,
-    Recipe,
-    Follow,
     Favorite,
-    ShoppingList,
+    Follow,
+    Ingredient,
     IngredientRecipe,
+    Recipe,
     RECIPE_NAME_MAX_LENGTH,
-)
+    ShoppingList,
+    Tag)
 from users.models import UserProfile, USERNAME_MAX_LENGTH
 from users.validators import forbidden_names_validator
-
 
 User = get_user_model()
 

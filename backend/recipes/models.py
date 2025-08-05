@@ -1,9 +1,10 @@
 import uuid
+
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import Q, F
-from django.db.models.constraints import UniqueConstraint, CheckConstraint
+from django.db.models import F, Q
+from django.db.models.constraints import CheckConstraint, UniqueConstraint
 
 RECIPE_NAME_MAX_LENGTH = 256
 User = get_user_model()

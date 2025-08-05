@@ -1,15 +1,15 @@
 from django.contrib import admin
 
-from .models import (
-    Tag,
-    Ingredient,
-    Recipe,
+from recipes.models import (
     Favorite,
     Follow,
-    ShoppingList,
-    RecipeTag,
+    Ingredient,
     IngredientRecipe,
+    Recipe,
+    RecipeTag,
+    ShoppingList,
     ShortLink,
+    Tag,
 )
 
 

@@ -2,47 +2,44 @@ import base64
 import imghdr
 import uuid
 
-from django.core.files.base import ContentFile
-from django.http import Http404, HttpResponse
-from rest_framework import viewsets, status
-from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
-)
-from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
-from rest_framework.views import APIView
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import action
-from rest_framework.authtoken.models import Token
-from djoser.views import UserViewSet
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import get_object_or_404, redirect
+from django.core.files.base import ContentFile
 from django.db.models import Sum
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
+from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet
+from rest_framework import status, viewsets
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from recipes.models import (
+    Favorite,
+    Follow,
+    Ingredient,
+    IngredientRecipe,
+    Recipe,
+    ShoppingList,
+    ShortLink,
+    Tag,
+)
+from .filters import RecipeFilter
+from .permissions import IsAuthorOrReadOnly
 from .serializers import (
-    UserProfileSerializer,
-    SetPasswordSerializer,
-    TagSerializer,
     IngredientSerializer,
     RecipeSerializer,
     RecipeShortSerializer,
+    SetPasswordSerializer,
     SubscriptionSerializer,
+    TagSerializer,
+    UserProfileSerializer,
 )
-from .permissions import IsAuthorOrReadOnly
-from recipes.models import (
-    Tag,
-    Ingredient,
-    Recipe,
-    ShortLink,
-    Favorite,
-    Follow,
-    ShoppingList,
-    IngredientRecipe,
-)
-from .filters import RecipeFilter
 
 User = get_user_model()
 
@@ -451,13 +448,14 @@ class RecipesViewSet(viewsets.ModelViewSet):
             name = item['ingredient__name']
             unit = item['ingredient__measurement_unit']
             amount = item['total_amount']
-            lines.append(f"{name} ({unit}) — {amount:g}")
+            lines.append(f"{name} ({unit}) — {amount: g}")
 
         content = "\n".join(lines)
         response = HttpResponse(
             content, content_type='text/plain; charset=utf-8'
         )
         response['Content-Disposition'] = (
-            f'attachment; filename="shopping_list_{request.user.username}.txt"'
+            'attachment; '
+            f'filename="shopping_list_{request.user.username}.txt"'
         )
         return response
