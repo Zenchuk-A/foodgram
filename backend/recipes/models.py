@@ -1,0 +1,242 @@
+import uuid
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
+from django.db import models
+from django.db.models import Q, F
+from django.db.models.constraints import UniqueConstraint, CheckConstraint
+
+RECIPE_NAME_MAX_LENGTH = 256
+User = get_user_model()
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=64, unique=True, verbose_name='Тег')
+    slug = models.SlugField(unique=True, verbose_name='Слаг')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
+
+class Ingredient(models.Model):
+    name = models.CharField(max_length=128, verbose_name='Название')
+    measurement_unit = models.CharField(
+        max_length=64, verbose_name='Единица измерения'
+    )
+
+    def __str__(self):
+        return f"{self.name} ({self.measurement_unit})"
+
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+
+
+class Recipe(models.Model):
+    author = models.ForeignKey(
+        User,
+        related_name='recipes',
+        on_delete=models.CASCADE,
+        verbose_name='Автор',
+    )
+    name = models.CharField(
+        max_length=RECIPE_NAME_MAX_LENGTH, verbose_name='Название'
+    )
+    image = models.ImageField(
+        upload_to='recipes/images/',
+        null=True,
+        default=None,
+        verbose_name='Изображение',
+    )
+    text = models.TextField(verbose_name='Описание')
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        through='IngredientRecipe',
+        related_name='recipes',
+        verbose_name='Ингредиенты',
+    )
+    tags = models.ManyToManyField(
+        Tag,
+        through='RecipeTag',
+        related_name='recipes',
+        verbose_name='Теги',
+    )
+    cooking_time = models.PositiveIntegerField(
+        verbose_name='Время приготовления (мин.)'
+    )
+
+    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+        unique_together = ('name', 'author')
+        ordering = ('-pub_date',)
+
+    def __str__(self):
+        if len(self.name) > 50:
+            return self.name[:50] + '...'
+        else:
+            return self.name
+
+
+class IngredientRecipe(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipe_ingredients',
+        verbose_name='Рецепт',
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        related_name='ingredient_recipes',
+        verbose_name='Ингредиент',
+    )
+    amount = models.DecimalField(
+        max_digits=6,
+        decimal_places=1,
+        validators=[MinValueValidator(0)],
+        default=1,
+        verbose_name='Количество',
+    )
+
+    class Meta:
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецепте'
+        unique_together = ('recipe', 'ingredient')
+
+    def __str__(self):
+        return (
+            f"{self.ingredient.name} - {self.amount} "
+            f"{self.ingredient.measurement_unit} in {self.recipe.name}"
+        )
+
+
+class RecipeTag(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipe_tags',
+        verbose_name='Рецепт',
+    )
+    tag = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE,
+        related_name='tags_recipe',
+        verbose_name='Тег',
+    )
+
+    def __str__(self):
+        return f'{self.recipe} {self.tag}'
+
+    class Meta:
+        verbose_name = 'Тег в рецепте'
+        verbose_name_plural = 'Теги в рецепте'
+        unique_together = ('recipe', 'tag')
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follower',
+        verbose_name='Подписчик',
+    )
+    following = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='following',
+        verbose_name='Подписка',
+    )
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=['user', 'following'], name='unique_follow'
+            ),
+            CheckConstraint(
+                check=~Q(user=F('following')), name='not_follow_self'
+            ),
+        ]
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+
+    def __str__(self):
+        return f'{self.user} подписан на {self.following}'
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorites',
+        verbose_name='Пользователь',
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='favorited_by',
+        verbose_name='Рецепт',
+    )
+
+    class Meta:
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
+        unique_together = ('user', 'recipe')
+
+    def __str__(self):
+        return f'{self.user} добавил в избранное {self.recipe}'
+
+
+class ShoppingList(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='shopping_list',
+        verbose_name='Пользователь',
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='in_shopping_lists',
+        verbose_name='Рецепт',
+    )
+
+    class Meta:
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Списки покупок'
+        unique_together = ('user', 'recipe')
+
+    def __str__(self):
+        return f'{self.user} добавил в список покупок {self.recipe}'
+
+
+class ShortLink(models.Model):
+    recipe = models.OneToOneField(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='short_link',
+        verbose_name='Рецепт',
+    )
+    short_url = models.CharField(
+        max_length=255, unique=True, verbose_name='Короткая ссылка'
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.short_url:
+            self.short_url = self.generate_short_url()
+        super().save(*args, **kwargs)
+
+    def generate_short_url(self):
+        return str(uuid.uuid4())[:8]
+
+    def __str__(self):
+        return self.short_url
+
+    class Meta:
+        verbose_name = 'Короткая ссылка'
+        verbose_name_plural = 'Короткие ссылки'

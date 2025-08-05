@@ -1,0 +1,39 @@
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from rest_framework.routers import DefaultRouter
+
+from .views import (
+    ProfileViewSet,
+    CustomTokenCreateView,
+    CustomTokenLogoutView,
+    TagViewSet,
+    IngredientViewSet,
+    RecipesViewSet,
+)
+
+router_v1 = DefaultRouter()
+router_v1.register('users', ProfileViewSet, basename='users')
+router_v1.register('tags', TagViewSet, basename='tags')
+router_v1.register('ingredients', IngredientViewSet, basename='ingredients')
+router_v1.register('recipes', RecipesViewSet, basename='recipes')
+
+urlpatterns = [
+    path('', include(router_v1.urls)),
+    path(
+        'recipes/<int:pk>/get-link/',
+        RecipesViewSet.as_view({'get': 'get_short_link'}),
+        name='get-short-link',
+    ),
+    path(
+        'auth/token/login/',
+        CustomTokenCreateView.as_view(),
+        name='custom_token_login',
+    ),
+    path(
+        'auth/token/logout/',
+        CustomTokenLogoutView.as_view(),
+        name='custom_token_logout',
+    ),
+    path('auth/', include('djoser.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

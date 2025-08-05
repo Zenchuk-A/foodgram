@@ -140,3 +140,9 @@ dmypy.json
 
 static/
 media/
+*.http
+backend/users/views.py
+backend/users/tests.py
+backend/recipes/views.py
+backend/recipes/tests.py
+backend/api/admin.py
