@@ -6,7 +6,7 @@ class CustomTokenAuthentication(TokenAuthentication):
     def authenticate(self, request):
         try:
             return super().authenticate(request)
-        except AuthenticationFailed as e:
+        except AuthenticationFailed:
             raise AuthenticationFailed(
                 "Учетные данные не были предоставлены.", code=401
             )

@@ -4,7 +4,6 @@ import uuid
 
 from django.core.files.base import ContentFile
 from django.http import Http404, HttpResponse
-from django.urls import reverse
 from rest_framework import viewsets, status
 from rest_framework.permissions import (
     AllowAny,
@@ -51,10 +50,9 @@ User = get_user_model()
 @action(['get'], detail=False)
 def redirect_to_recipe(request, short_url):
     short_link = get_object_or_404(ShortLink, short_url=short_url)
-    full_link = request.build_absolute_uri(
-        f'/recipes/{short_link.recipe.id}/'
-    )
+    full_link = request.build_absolute_uri(f'/recipes/{short_link.recipe.id}/')
     return redirect(full_link)
+
 
 class CustomTokenCreateView(APIView):
     authentication_classes = []
