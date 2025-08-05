@@ -17,7 +17,8 @@ from recipes.models import (
     Recipe,
     RECIPE_NAME_MAX_LENGTH,
     ShoppingList,
-    Tag)
+    Tag,
+)
 from users.models import UserProfile, USERNAME_MAX_LENGTH
 from users.validators import forbidden_names_validator
 
