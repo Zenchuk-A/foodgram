@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  tests:
+  backend_tests:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -44,7 +44,7 @@ jobs:
   build_backend_and_push_to_docker_hub:
     name: Push backend Docker image to DockerHub
     runs-on: ubuntu-latest
-    needs: tests
+    needs: backend_tests
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -74,7 +74,8 @@ jobs:
     - name: Install dependencies
       run: |
         cd frontend/
-        npm ci
+        npm install --legacy-peer-deps
+        npm ci --no-audit
 
     - name: Test frontend
       run: |
