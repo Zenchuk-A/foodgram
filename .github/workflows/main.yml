@@ -15,23 +15,13 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 18
-        cache: 'yarn'
-        cache-dependency-path: 'frontend/yarn.lock'
 
-    - name: Clean install dependencies
-      working-directory: ./frontend
+    - name: Install dependencies
       run: |
-        rm -rf node_modules package-lock.json
-        yarn install --ignore-engines --ignore-optional
-        yarn add -D jest@latest @testing-library/react@latest @testing-library/jest-dom@latest
-        if yarn check --verify-tree | grep -q "error"; then
-          echo "::error::Dependency errors found!"
-          yarn check --verify-tree
-          exit 1
-        fi
+        cd frontend/
+        npm ci
 
     - name: Test frontend
-      working-directory: ./frontend
       run: |
-        echo "import { TextEncoder, TextDecoder } from 'util'; global.TextEncoder = TextEncoder; global.TextDecoder = TextDecoder;" > jest.setup.js
-        yarn test --ci --watchAll=false --testEnvironment=jsdom --setupFilesAfterEnv=./jest.setup.js
+        cd frontend/
+        npm run test
