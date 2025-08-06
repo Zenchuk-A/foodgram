@@ -22,7 +22,7 @@ jobs:
       working-directory: ./frontend
       run: |
         rm -rf node_modules package-lock.json
-        yarn install --frozen-lockfile --ignore-engines --ignore-optional
+        yarn install --ignore-engines --ignore-optional
         if yarn check --verify-tree | grep -q "error"; then
           echo "::error::Dependency errors found!"
           yarn check --verify-tree
