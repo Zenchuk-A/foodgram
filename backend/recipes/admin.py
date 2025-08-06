@@ -44,6 +44,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'author__username',
     )
     list_filter = ('tags',)
+    readonly_fields = ('favorites_count',)
 
     def author_name(self, obj):
         return obj.author.first_name or obj.author.username
