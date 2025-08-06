@@ -37,6 +37,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'author_name',
+        'favorites_count',
     )
     search_fields = (
         'name',
@@ -49,6 +50,12 @@ class RecipeAdmin(admin.ModelAdmin):
 
     author_name.admin_order_field = 'author__first_name'
     author_name.short_description = 'Автор'
+
+    def favorites_count(self, obj):
+        return obj.favorited_by.count()
+
+    favorites_count.short_description = 'В избранном'
+    favorites_count.admin_order_field = 'favorited_by__count'
 
     class Meta:
         model = Recipe

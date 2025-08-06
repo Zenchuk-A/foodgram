@@ -74,8 +74,7 @@ jobs:
   #   - name: Install dependencies
   #     run: |
   #       cd frontend/
-  #       npm install --legacy-peer-deps
-  #       npm ci --no-audit
+  #       npm ci
 
   #   - name: Test frontend
   #     run: |
@@ -161,8 +160,6 @@ jobs:
         Автор: ${{ github.actor }}
         Сообщение коммита: ${{ github.event.commits[0].message }}
         Ссылка на коммит: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
-        Ссылка на PR: ${{ github.event.pull_request.html_url }}
-
 
     steps:
     - name: Send message
