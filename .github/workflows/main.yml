@@ -22,7 +22,7 @@ jobs:
       working-directory: ./frontend
       run: |
         rm -rf node_modules
-        npm install --legacy-peer-deps --no-audit --no-fund --prefer-offline --loglevel=error
+        npm install --force --no-audit --no-fund --prefer-offline --loglevel=error
         npm dedupe
 
     - name: Test frontend
