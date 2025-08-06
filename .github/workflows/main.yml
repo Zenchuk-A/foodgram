@@ -21,10 +21,14 @@ jobs:
     - name: Clean install dependencies
       working-directory: ./frontend
       run: |
-        rm -rf node_modules
-        yarn install
-        yarn dedupe
+        rm -rf node_modules package-lock.json
+        yarn install --frozen-lockfile --ignore-engines --ignore-optional
+        if yarn check --verify-tree | grep -q "error"; then
+          echo "::error::Dependency errors found!"
+          yarn check --verify-tree
+          exit 1
+        fi
 
     - name: Test frontend
       working-directory: ./frontend
-      run: npm test -- --ci --watchAll=false
+      run: yarn test -- --ci --watchAll=false
