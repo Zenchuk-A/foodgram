@@ -7,24 +7,27 @@ on:
 
 jobs:
   frontend_tests:
-    runs-on: ubuntu-latest
+  runs-on: ubuntu-latest
 
-    steps:
+  steps:
     - uses: actions/checkout@v3
-    - name: Set up nodeJS
+
+    - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
         node-version: 18
         cache: 'npm'
         cache-dependency-path: 'frontend/package-lock.json'
 
-    - name: Clean install dependencies
+    - name: Install dependencies
       working-directory: ./frontend
       run: |
-        rm -rf node_modules package-lock.json
-        npm ci --legacy-peer-deps --no-audit --no-fund --prefer-offline --loglevel=error
+        # Полная очистка перед установкой
+        rm -rf node_modules
+        # Установка зависимостей
+        npm install --legacy-peer-deps --no-audit --no-fund --prefer-offline --loglevel=error
         npm dedupe
 
-    - name: Test frontend
+    - name: Run tests
       working-directory: ./frontend
       run: npm test -- --ci --watchAll=false
