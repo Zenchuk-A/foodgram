@@ -15,14 +15,14 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 18
+        cache: 'npm'
 
     - name: Install dependencies
+      working-directory: ./frontend
       run: |
-        cd frontend/
-        npm install
+        npm install --legacy-peer-deps --no-audit --no-fund
         npm dedupe
 
     - name: Test frontend
-      run: |
-        cd frontend/
-        npm run test
+      working-directory: ./frontend
+      run: npm test -- --ci --watchAll=false
