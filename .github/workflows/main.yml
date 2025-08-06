@@ -23,6 +23,7 @@ jobs:
       run: |
         rm -rf node_modules package-lock.json
         yarn install --ignore-engines --ignore-optional
+        yarn add -D jest@latest @testing-library/react@latest @testing-library/jest-dom@latest
         if yarn check --verify-tree | grep -q "error"; then
           echo "::error::Dependency errors found!"
           yarn check --verify-tree
@@ -31,4 +32,6 @@ jobs:
 
     - name: Test frontend
       working-directory: ./frontend
-      run: yarn test -- --ci --watchAll=false
+      run: |
+        echo "import { TextEncoder, TextDecoder } from 'util'; global.TextEncoder = TextEncoder; global.TextDecoder = TextDecoder;" > jest.setup.js
+        yarn test --ci --watchAll=false --testEnvironment=jsdom --setupFilesAfterEnv=./jest.setup.js
