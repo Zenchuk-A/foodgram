@@ -22,7 +22,7 @@ jobs:
       working-directory: ./frontend
       run: |
         rm -rf node_modules
-        yarn install --frozen-lockfile
+        yarn install
         yarn dedupe
 
     - name: Test frontend
