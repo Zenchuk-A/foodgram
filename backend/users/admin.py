@@ -10,4 +10,5 @@ class UserProfileAdmin(UserAdmin):
     )
     search_fields = ('email', 'username')
 
+
 admin.site.register(UserProfile, UserProfileAdmin)

@@ -1,10 +1,6 @@
 import base64
-import uuid
-import imghdr
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.files.base import ContentFile
 from django.db import transaction
 from rest_framework import serializers

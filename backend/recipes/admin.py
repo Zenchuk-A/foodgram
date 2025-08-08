@@ -22,9 +22,7 @@ class IngredientRecipeInline(admin.TabularInline):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    inlines = (
-        IngredientRecipeInline,
-    )
+    inlines = (IngredientRecipeInline,)
     list_display = (
         'name',
         'author_name',
