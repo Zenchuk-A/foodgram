@@ -147,3 +147,4 @@ backend/recipes/views.py
 backend/recipes/tests.py
 backend/api/admin.py
 .github/workflows/main_yml*
+api/migrations

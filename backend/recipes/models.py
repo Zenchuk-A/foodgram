@@ -11,6 +11,10 @@ TAG_NAME_MAX_LENGTH = 32
 TAG_SLUG_MAX_LENGTH = 32
 INGREDIENT_NAME_MAX_LENGTH = 128
 INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH = 64
+MIN_COOKING_TIME = 1
+MAX_COOKING_TIME = 32000
+MIN_AMOUNT = 1
+MAX_AMOUNT = 32000
 User = get_user_model()
 
 
@@ -79,7 +83,18 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления (мин.)',
-        validators=[MinValueValidator(1), MaxValueValidator(32000)],
+        validators=[
+            MinValueValidator(
+                MIN_COOKING_TIME,
+                message='Время приготовления не может быть '
+                f'меньше {MIN_COOKING_TIME} минуты',
+            ),
+            MaxValueValidator(
+                MAX_COOKING_TIME,
+                message='Время приготовления не может '
+                f'превышать {MAX_COOKING_TIME} минут',
+            ),
+        ],
     )
     short_url = models.CharField(
         max_length=8,
@@ -108,7 +123,10 @@ class Recipe(models.Model):
         super().save(*args, **kwargs)
 
     def generate_short_url(self):
-        return str(uuid.uuid4())[:8]
+        while True:
+            short_url = str(uuid.uuid4())[:8]
+            if not Recipe.objects.filter(short_url=short_url).exists():
+                return short_url
 
 
 class IngredientRecipe(models.Model):
@@ -125,7 +143,16 @@ class IngredientRecipe(models.Model):
         verbose_name='Ингредиент',
     )
     amount = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(32000)],
+        validators=[
+            MinValueValidator(
+                MIN_AMOUNT,
+                message=f'Количество не может быть меньше {MIN_AMOUNT}',
+            ),
+            MaxValueValidator(
+                MAX_AMOUNT,
+                message=f'Количество не может превышать {MAX_AMOUNT}',
+            ),
+        ],
         default=1,
         verbose_name='Количество',
     )

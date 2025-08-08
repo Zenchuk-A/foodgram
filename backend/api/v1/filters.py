@@ -1,5 +1,6 @@
 import django_filters
 from django_filters import rest_framework as filters
+
 from recipes.models import Ingredient, Recipe
 
 
@@ -23,7 +24,12 @@ class RecipeFilter(django_filters.FilterSet):
 
     class Meta:
         model = Recipe
-        fields = ('tags', 'author', 'is_favorited', 'is_in_shopping_cart',)
+        fields = (
+            'tags',
+            'author',
+            'is_favorited',
+            'is_in_shopping_cart',
+        )
 
     def filter_is_favorited(self, queryset, name, value):
         val = str_to_bool(value)
@@ -49,4 +55,4 @@ class IngredientFilter(filters.FilterSet):
 
     class Meta:
         model = Ingredient
-        fields = ['name']
+        fields = ('name',)

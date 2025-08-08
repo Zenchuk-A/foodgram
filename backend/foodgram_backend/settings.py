@@ -143,6 +143,11 @@ DJOSER = {
     'SERIALIZERS': {
         'user': 'api.v1.serializers.UserProfileSerializer',
         'current_user': 'api.v1.serializers.UserProfileSerializer',
+        # djoser.serializers.UserCreateSerializer не проверяет
+        # обязательность присутствия first_name и last_name
+        # при его применении проваливаются тесты
+        # user_registration_without_first_name и
+        # user_registration_without_last_name
         'user_create': 'api.v1.serializers.UserCreateSerializer',
     },
 }
