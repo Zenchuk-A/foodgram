@@ -6,9 +6,8 @@ from .models import UserProfile
 
 class UserProfileAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
-        ('Extra Fields', {'fields': ('is_subscribed', 'avatar')}),
+        ('Extra Fields', {'fields': ('avatar',)}),
     )
     search_fields = ('email', 'username')
-
 
 admin.site.register(UserProfile, UserProfileAdmin)

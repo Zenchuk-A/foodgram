@@ -3,8 +3,7 @@ from django.conf.urls.static import static
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (CustomTokenCreateView, CustomTokenLogoutView,
-                    IngredientViewSet, ProfileViewSet, RecipesViewSet,
+from .views import (IngredientViewSet, ProfileViewSet, RecipesViewSet,
                     TagViewSet)
 
 router_v1 = DefaultRouter()
@@ -20,15 +19,5 @@ urlpatterns = [
         RecipesViewSet.as_view({'get': 'get_short_link'}),
         name='get-short-link',
     ),
-    path(
-        'auth/token/login/',
-        CustomTokenCreateView.as_view(),
-        name='custom_token_login',
-    ),
-    path(
-        'auth/token/logout/',
-        CustomTokenLogoutView.as_view(),
-        name='custom_token_logout',
-    ),
-    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.authtoken')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

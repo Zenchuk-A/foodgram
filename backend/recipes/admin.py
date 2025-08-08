@@ -6,17 +6,9 @@ from recipes.models import (
     Ingredient,
     IngredientRecipe,
     Recipe,
-    RecipeTag,
     ShoppingList,
-    ShortLink,
     Tag,
 )
-
-
-class RecipeTagInline(admin.TabularInline):
-    model = RecipeTag
-    extra = 0
-    min_num = 1
 
 
 class IngredientRecipeInline(admin.TabularInline):
@@ -31,7 +23,6 @@ class IngredientRecipeInline(admin.TabularInline):
 
 class RecipeAdmin(admin.ModelAdmin):
     inlines = (
-        RecipeTagInline,
         IngredientRecipeInline,
     )
     list_display = (
@@ -125,27 +116,9 @@ class FollowAdmin(admin.ModelAdmin):
         )
 
 
-class ShortLinkAdmin(admin.ModelAdmin):
-    list_display = (
-        'recipe_id',
-        'recipe',
-        'short_url',
-    )
-    readonly_fields = ('recipe', 'short_url')
-    search_fields = ('recipe__name',)
-
-    class Meta:
-        model = ShortLink
-        fields = (
-            'recipe',
-            'short_url',
-        )
-
-
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Favorite, FavoriteAdmin)
 admin.site.register(ShoppingList, ShoppingListAdmin)
 admin.site.register(Follow, FollowAdmin)
-admin.site.register(ShortLink, ShortLinkAdmin)

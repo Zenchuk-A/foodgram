@@ -12,12 +12,11 @@ SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '')
 ALLOWED_HOSTS = (
-    [host.strip() for host in allowed_hosts_env.split(',')]
-    if allowed_hosts_env
-    else []
+    [host.strip() for host in os.getenv('ALLOWED_HOSTS', '').split(',')]
 )
+
+USE_SQLITE = os.getenv('USE_SQLITE', 'False').lower() == 'true'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -27,8 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_filters',
-    'rest_framework.authtoken',
     'rest_framework',
+    'rest_framework.authtoken',
     'djoser',
     'django_extensions',
     'users.apps.UsersConfig',
@@ -68,6 +67,9 @@ WSGI_APPLICATION = 'foodgram_backend.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    } if USE_SQLITE else {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('POSTGRES_DB', 'django'),
         'USER': os.getenv('POSTGRES_USER', 'django'),
@@ -118,7 +120,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'api.authentication.CustomTokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
@@ -129,12 +131,20 @@ REST_FRAMEWORK = {
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
-    'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
-    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'USERNAME_CHANGED_EMAIL_CONFIRMATION': False,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': False,
     'SEND_ACTIVATION_EMAIL': False,
-    'SET_PASSWORD_RETYPE': True,
-    'TOKEN_MODEL': None,
-    'SERIALIZERS': {},
+    'SET_PASSWORD_RETYPE': False,
+    'TOKEN_MODEL': 'rest_framework.authtoken.models.Token',
+    'HIDE_USERS': False,
+    'PERMISSIONS': {
+        'user_list': ['rest_framework.permissions.AllowAny'],
+    },
+    'SERIALIZERS': {
+        'user': 'api.v1.serializers.UserProfileSerializer',
+        'current_user': 'api.v1.serializers.UserProfileSerializer',
+        'user_create': 'api.v1.serializers.UserCreateSerializer',
+    },
 }
 
 APPEND_SLASH = False

@@ -1,13 +1,9 @@
-from api.v1.views import redirect_to_recipe
 from django.contrib import admin
 from django.urls import include, path, re_path
 
+from api.v1.views import redirect_to_recipe
+
 urlpatterns = [
-    # path(
-    #     's/<str:short_url>/',
-    #     redirect_to_recipe,
-    #     name='short-link-redirect',
-    # ),
     re_path(
         r'^s/(?P<short_url>[^/]+)/?$',
         redirect_to_recipe,

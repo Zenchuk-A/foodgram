@@ -1,5 +1,6 @@
 import django_filters
-from recipes.models import Recipe
+from django_filters import rest_framework as filters
+from recipes.models import Ingredient, Recipe
 
 
 def str_to_bool(value):
@@ -22,13 +23,12 @@ class RecipeFilter(django_filters.FilterSet):
 
     class Meta:
         model = Recipe
-        fields = ['tags', 'author', 'is_favorited', 'is_in_shopping_cart']
+        fields = ('tags', 'author', 'is_favorited', 'is_in_shopping_cart',)
 
     def filter_is_favorited(self, queryset, name, value):
         val = str_to_bool(value)
-        print(f'filter_is_favorited value: {val} ({type(val)})')
         user = self.request.user
-        if user.is_anonymous:
+        if not user.is_authenticated:
             return queryset.none() if val else queryset
         if val:
             return queryset.filter(favorited_by__user=user)
@@ -36,10 +36,17 @@ class RecipeFilter(django_filters.FilterSet):
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
         val = str_to_bool(value)
-        print(f'filter_is_in_shopping_cart value: {val} ({type(val)})')
         user = self.request.user
-        if user.is_anonymous:
+        if not user.is_authenticated:
             return queryset.none() if val else queryset
         if val:
             return queryset.filter(in_shopping_lists__user=user)
         return queryset.exclude(in_shopping_lists__user=user)
+
+
+class IngredientFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name='name', lookup_expr='istartswith')
+
+    class Meta:
+        model = Ingredient
+        fields = ['name']
