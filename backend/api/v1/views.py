@@ -57,7 +57,7 @@ class ProfileViewSet(UserViewSet):
     permission_classes = (IsAuthenticated,)
     pagination_class = PageSizeLimitPagination
 
-    @action(["get"], detail=False)
+    @action(['get'], detail=False)
     def me(self, request, *args, **kwargs):
         return super().me(request, *args, **kwargs)
 
@@ -66,23 +66,18 @@ class ProfileViewSet(UserViewSet):
             return [AllowAny()]
         return super().get_permissions()
 
-    @action(["put"], detail=False, url_path='me/avatar')
+    @action(['put'], detail=False, url_path='me/avatar')
     def avatar_upload(self, request, *args, **kwargs):
         user = request.user
-        serializer = AvatarSerializer(data=request.data)
+        serializer = AvatarSerializer(user, data=request.data)
 
         serializer.is_valid(raise_exception=True)
 
-        try:
-            user = serializer.save(user)
-            return Response(
-                {"avatar": request.build_absolute_uri(user.avatar.url)},
-                status=status.HTTP_200_OK,
-            )
-        except Exception as e:
-            return Response(
-                {"error": str(e)}, status=status.HTTP_400_BAD_REQUEST
-            )
+        user = serializer.save()
+        return Response(
+            {'avatar': request.build_absolute_uri(user.avatar.url)},
+            status=status.HTTP_200_OK,
+        )
 
     @avatar_upload.mapping.delete
     def avatar_delete(self, request, *args, **kwargs):
@@ -112,7 +107,7 @@ class ProfileViewSet(UserViewSet):
         serializer.save()
 
         return Response(
-            SubscribeSerializer(author).data, status=status.HTTP_201_CREATED
+            serializer.data, status=status.HTTP_201_CREATED
         )
 
     @subscribe.mapping.delete
@@ -171,7 +166,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def get_short_link(self, request, pk=None):
         recipe = self.get_object()
-        recipe.save()
         full_short_link = request.build_absolute_uri(f'/s/{recipe.short_url}/')
         return Response(
             {'short-link': full_short_link}, status=status.HTTP_200_OK
@@ -251,14 +245,14 @@ class RecipesViewSet(viewsets.ModelViewSet):
         )
 
         lines = [
-            f"{item['ingredient__name']} "
-            f"({item['ingredient__measurement_unit']})"
-            f" — {item['total_amount']}"
+            f'{item['ingredient__name']} '
+            f'({item['ingredient__measurement_unit']})'
+            f' — {item['total_amount']}'
             for item in ingredients
         ]
 
         response = HttpResponse(
-            "\n".join(lines), content_type='text/plain; charset=utf-8'
+            '\n'.join(lines), content_type='text/plain; charset=utf-8'
         )
         response['Content-Disposition'] = (
             'attachment; filename="shopping_list.txt"'

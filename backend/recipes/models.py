@@ -15,6 +15,8 @@ MIN_COOKING_TIME = 1
 MAX_COOKING_TIME = 32000
 MIN_AMOUNT = 1
 MAX_AMOUNT = 32000
+SHORT_URL_MAX_LENGTH = 8
+RECIPE_NAME_MAX_DISPLAY_LENGTH = 50
 User = get_user_model()
 
 
@@ -97,7 +99,7 @@ class Recipe(models.Model):
         ],
     )
     short_url = models.CharField(
-        max_length=8,
+        max_length=SHORT_URL_MAX_LENGTH,
         unique=True,
         blank=True,
         verbose_name='Короткая ссылка',
@@ -112,8 +114,8 @@ class Recipe(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        if len(self.name) > 50:
-            return f'Рецепт: {self.name[:50]}...'
+        if len(self.name) > RECIPE_NAME_MAX_DISPLAY_LENGTH:
+            return f'Рецепт: {self.name[:RECIPE_NAME_MAX_DISPLAY_LENGTH]}...'
         else:
             return f'Рецепт: {self.name}'
 
@@ -124,7 +126,7 @@ class Recipe(models.Model):
 
     def generate_short_url(self):
         while True:
-            short_url = str(uuid.uuid4())[:8]
+            short_url = str(uuid.uuid4())[:SHORT_URL_MAX_LENGTH]
             if not Recipe.objects.filter(short_url=short_url).exists():
                 return short_url
 

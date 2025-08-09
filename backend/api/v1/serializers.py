@@ -6,8 +6,6 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
-
 from recipes.models import (
     Favorite,
     Follow,
@@ -33,31 +31,12 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
-class UserCreateSerializer(BaseUserCreateSerializer):
-    class Meta(BaseUserCreateSerializer.Meta):
-        fields = (
-            'id',
-            'email',
-            'username',
-            'first_name',
-            'last_name',
-            'password',
-        )
-        extra_kwargs = {
-            'first_name': {'required': True},
-            'last_name': {'required': True},
-        }
-
-
-class AvatarSerializer(serializers.Serializer):
+class AvatarSerializer(serializers.ModelSerializer):
     avatar = Base64ImageField(required=True)
 
-    def save(self, user):
-        avatar = self.validated_data['avatar']
-        user.avatar.save(
-            f'avatar_{user.id}.{avatar.name.split(".")[-1]}', avatar, save=True
-        )
-        return user
+    class Meta:
+        model = UserProfile
+        fields = ('avatar',)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -314,11 +293,11 @@ class FollowCreateSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         if user == value:
             raise serializers.ValidationError(
-                "Нельзя подписаться на самого себя"
+                'Нельзя подписаться на самого себя'
             )
         if Follow.objects.filter(user=user, following=value).exists():
             raise serializers.ValidationError(
-                "Вы уже подписаны на этого пользователя"
+                'Вы уже подписаны на этого пользователя'
             )
         return value
 
