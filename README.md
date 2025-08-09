@@ -62,9 +62,6 @@ docker compose exec backend python manage.py createsuperuser
 docker compose exec backend python manage.py import_csv
 ```
 
-## После запуска проекта документация будет доступна по адресу:
-http://localhost/api/docs/
-
 ## Примеры запросов/ответов
 Регистрация пользователя
 Запрос:
