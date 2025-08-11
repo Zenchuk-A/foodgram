@@ -110,8 +110,12 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-        unique_together = ('name', 'author')
         ordering = ('-pub_date',)
+        constraints = (
+            models.UniqueConstraint(
+                fields=['name', 'author'], name='unique_recipe_author'
+            ),
+        )
 
     def __str__(self):
         if len(self.name) > RECIPE_NAME_MAX_DISPLAY_LENGTH:
@@ -231,10 +235,15 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
-        unique_together = ('user', 'recipe')
         ordering = (
             'user',
             'recipe',
+        )
+        constraints = (
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_user_recipe_favorite',
+            ),
         )
 
     def __str__(self):
@@ -258,10 +267,15 @@ class ShoppingList(models.Model):
     class Meta:
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки покупок'
-        unique_together = ('user', 'recipe')
         ordering = (
             'user',
             'recipe',
+        )
+        constraints = (
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_user_recipe_shopping_list',
+            ),
         )
 
     def __str__(self):

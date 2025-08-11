@@ -69,13 +69,15 @@ class ProfileViewSet(UserViewSet):
     @action(['put'], detail=False, url_path='me/avatar')
     def avatar_upload(self, request, *args, **kwargs):
         user = request.user
-        serializer = AvatarSerializer(user, data=request.data)
+        serializer = AvatarSerializer(
+            user, data=request.data, context={'request': request}
+        )
 
         serializer.is_valid(raise_exception=True)
 
         user = serializer.save()
         return Response(
-            {'avatar': request.build_absolute_uri(user.avatar.url)},
+            serializer.data,
             status=status.HTTP_200_OK,
         )
 
@@ -106,9 +108,7 @@ class ProfileViewSet(UserViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED
-        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @subscribe.mapping.delete
     def unsubscribe(self, request, id=None):

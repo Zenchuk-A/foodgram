@@ -38,6 +38,13 @@ class AvatarSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ('avatar',)
 
+    def to_representation(self, instance):
+        return {
+            'avatar': self.context['request'].build_absolute_uri(
+                instance.avatar.url
+            )
+        }
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     avatar = Base64ImageField(required=False, allow_null=True)
