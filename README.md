@@ -1,6 +1,5 @@
 [![CI/CD Status](https://github.com/Zenchuk-A/foodgram/actions/workflows/main.yml/badge.svg)](https://github.com/Zenchuk-A/foodgram/actions)
 ## Foodgram - сервис публикации рецептов в рамках учебного курса Яндекс.Практикум
-Финальный вариант развёрнут по адресу: foodgram-zen.sytes.net
 
 Foodgram - это веб-приложение для публикации кулинарных рецептов. Пользователи могут:
 - Публиковать свои рецепты
